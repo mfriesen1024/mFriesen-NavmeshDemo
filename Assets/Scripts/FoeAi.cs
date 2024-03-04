@@ -31,7 +31,7 @@ public class FoeManager : MonoBehaviour
     [SerializeField] float atkRadius = 2, hitLeniency = 0.25f, sightRadius = 7, maxPatience = 3, attackCD = 3;
     [SerializeField] int hp = 10, maxHP = 10, damage = 10;
 
-    // Private backend
+    // Private variables
     float timer = 0;
     int waypointIndex = 0;
 
