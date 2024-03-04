@@ -8,7 +8,8 @@ enum foeState
     search,
     attack,
     returning,
-    recover // functionally same as return, but heals before doing anything else.
+    recover, // functionally same as return, but heals before doing anything else.
+    death
 }
 
 public class FoeManager : MonoBehaviour
@@ -47,6 +48,8 @@ public class FoeManager : MonoBehaviour
     {
         CheckState();
         agent.SetDestination(GetDestination());
+
+        if (state == foeState.death) { Destroy(gameObject); }
     }
 
     void CheckState() // This should be used to set state
@@ -73,13 +76,13 @@ public class FoeManager : MonoBehaviour
         {
             // Get positions
             Vector3 ourPos = transform.position; Vector3 targetPos = player.transform.position;
-            if (Vector3.Distance(targetPos, ourPos) < atkRadius) { state = foeState.attack; agent.SetDestination(transform.position); }
+            if (Vector3.Distance(targetPos, ourPos) < atkRadius) { state = foeState.attack; }
             else if (state == foeState.attack) { state = foeState.follow; }
         }
 
         void InjuryCheck()
         {
-            if (hp < 5) { state = foeState.recover; }
+            if (hp < 5) { state = foeState.recover; if (hp < 0) { state = foeState.death; } }
             if (state == foeState.recover && timer > maxHP - hp) { state = foeState.returning; }
         }
 
@@ -90,13 +93,60 @@ public class FoeManager : MonoBehaviour
 
         void ReturnedCheck() // Call from return.
         {
-            if (Vector3.Distance(transform.position, waypoints[waypointIndex]) < 0.25) { state = foeState.patrol; }
+            if (IsNearCurrentWaypoint()) { state = foeState.patrol; }
         }
+    }
+
+    private bool IsNearCurrentWaypoint()
+    {
+        return Vector3.Distance(transform.position, waypoints[waypointIndex]) < 0.25;
+    }
+
+    void TakeDamage(int value)
+    {
+        // This will reset healing and searching timers. 
+        hp -= value; timer = 0;
     }
 
     Vector3 GetDestination()
     {
-        return new Vector3(0, 0, 0);
+        Vector3 returnable = new();
+
+        switch (state)
+        {
+            case foeState.patrol: return Patrol();
+            case foeState.follow: return player.transform.position;
+            case foeState.search: return agent.destination;
+            case foeState.recover: Recover(); return waypoints[0];
+            case foeState.returning: return waypoints[0];
+            case foeState.attack: Attack(); return transform.position;
+        }
+
+        Vector3 Patrol()
+        {
+            if (IsNearCurrentWaypoint())
+            {
+                // reset index if out of range.
+                waypointIndex++; if (waypointIndex == waypoints.Length) { waypointIndex = 0; }
+            }
+            return waypoints[waypointIndex];
+        }
+
+        void Recover()
+        {
+            timer += Time.deltaTime;
+            if (timer > maxPatience) { hp = maxHP; }
+        }
+
+        void Attack()
+        {
+            FoeImplosion attack = GameObject.CreatePrimitive(PrimitiveType.Sphere).AddComponent<FoeImplosion>();
+            attack.transform.position = transform.position;
+            object[] sendable = { atkRadius, damage };
+            attack.SendMessage("TransferData", sendable);
+        }
+
+        return returnable;
     }
 }
 
@@ -104,4 +154,29 @@ public class FoeManager : MonoBehaviour
 public class FoeImplosion : MonoBehaviour
 {
     // This is used for the foe attack.
+    int timer = 3;
+    int radius;
+    int damage;
+
+    protected virtual void FixedUpdate()
+    {
+        // Keep this alive for 3 fixed updates.
+        timer--;
+
+        if (timer < 0) { Destroy(gameObject); }
+    }
+
+    void TransferData(object[] data)
+    {
+        SphereCollider collider = GetComponent<SphereCollider>();
+        radius = (int)data[0];
+        damage = (int)data[1];
+
+        collider.radius = radius;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        other.gameObject.SendMessageUpwards("TakeDamage", damage);
+    }
 }
