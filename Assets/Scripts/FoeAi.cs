@@ -116,7 +116,7 @@ public class FoeManager : MonoBehaviour
         {
             case foeState.patrol: return Patrol();
             case foeState.follow: return player.transform.position;
-            case foeState.search: return agent.destination;
+            case foeState.search: UpdateBoredom(); return agent.destination;
             case foeState.recover: Recover(); return waypoints[0];
             case foeState.returning: return waypoints[0];
             case foeState.attack: Attack(); return transform.position;
@@ -136,6 +136,11 @@ public class FoeManager : MonoBehaviour
         {
             timer += Time.deltaTime;
             if (timer > maxPatience) { hp = maxHP; }
+        }
+
+        void UpdateBoredom()
+        {
+            timer += Time.deltaTime;
         }
 
         void Attack()
