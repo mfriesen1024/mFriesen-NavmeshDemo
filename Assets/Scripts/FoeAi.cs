@@ -1,19 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-enum foeState {patrol, follow, search, engaging, retreat}
+enum foeState { patrol, follow, search, engaging, retreat }
 
 public class FoeManager : MonoBehaviour
 {
     // material things
-    [SerializeField]Color color;
-    [SerializeField]Material material;
+    [SerializeField] Color color;
+    [SerializeField] Material material;
 
     // Navmesh things
-    [SerializeField]UnityEngine.AI.NavMeshAgent agent;
-    [SerializeField]foeState state;
-    [SerializeField]Vector3[] waypoints;
+    [SerializeField] UnityEngine.AI.NavMeshAgent agent;
+    [SerializeField] foeState state;
+    [SerializeField] Vector3[] waypoints;
     GameObject player;
 
     // Foe stat things
@@ -35,13 +33,15 @@ public class FoeManager : MonoBehaviour
         agent.SetDestination(GetDestination());
     }
 
-    void CheckState(){
-        
+    void CheckState()
+    {
+
 
 
     }
 
-    Vector3 GetDestination(){
-        return new Vector3(0,0,0);
+    Vector3 GetDestination()
+    {
+        return new Vector3(0, 0, 0);
     }
 }
