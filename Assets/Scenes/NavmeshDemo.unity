@@ -452,18 +452,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0, g: 0, b: 0, a: 0}
-  material: {fileID: 0}
-  agent: {fileID: 0}
+  material: {fileID: 2100000, guid: 17e8ca3bc880ed94d8e6525d82011013, type: 2}
+  agent: {fileID: 528842935}
   state: 0
   waypoints:
   - {x: 12.5, y: 0, z: 12.5}
+  - {x: -12.5, y: 0, z: 12.5}
   - {x: 12.5, y: 0, z: -12.5}
   - {x: -12.5, y: 0, z: -12.5}
-  - {x: -12.5, y: 0, z: 12.5}
   - {x: 0, y: 0, z: 0}
-  atkRadius: 0
-  sightRadius: 0
-  maxPatience: 0
+  atkRadius: 2
+  sightRadius: 7
+  maxPatience: 3
   hp: 10
   maxHP: 10
   damage: 10

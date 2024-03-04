@@ -28,7 +28,7 @@ public class FoeManager : MonoBehaviour
 
     [Category("Stats")]
     // Foe stat things
-    [SerializeField] float atkRadius = 2, sightRadius = 7, maxPatience = 3;
+    [SerializeField] float atkRadius = 2, hitLeniency = 0.25f, sightRadius = 7, maxPatience = 3, attackCD = 3;
     [SerializeField] int hp = 10, maxHP = 10, damage = 10;
 
     // Private backend
@@ -77,18 +77,18 @@ public class FoeManager : MonoBehaviour
             // Get positions
             Vector3 ourPos = transform.position; Vector3 targetPos = player.transform.position;
             if (Vector3.Distance(targetPos, ourPos) < atkRadius) { state = foeState.attack; }
-            else if (state == foeState.attack) { state = foeState.follow; }
+            else if (state == foeState.attack) { state = foeState.follow; timer = 0; }
         }
 
         void InjuryCheck()
         {
             if (hp < 5) { state = foeState.recover; if (hp < 0) { state = foeState.death; } }
-            if (state == foeState.recover && timer > maxHP - hp) { state = foeState.returning; }
+            if (state == foeState.recover && timer > maxHP - hp) { state = foeState.returning; timer = 0; }
         }
 
         void BoredomCheck() // Call from search. The guard is easily bored.
         {
-            if (timer < maxPatience) { state = foeState.returning; }
+            if (timer > maxPatience) { state = foeState.returning; timer = 0; }
         }
 
         void ReturnedCheck() // Call from return.
@@ -99,7 +99,7 @@ public class FoeManager : MonoBehaviour
 
     private bool IsNearCurrentWaypoint()
     {
-        return Vector3.Distance(transform.position, waypoints[waypointIndex]) < 0.25;
+        return Vector3.Distance(transform.position, waypoints[waypointIndex]) < 1.25f;
     }
 
     void TakeDamage(int value)
@@ -145,10 +145,15 @@ public class FoeManager : MonoBehaviour
 
         void Attack()
         {
-            FoeImplosion attack = GameObject.CreatePrimitive(PrimitiveType.Sphere).AddComponent<FoeImplosion>();
-            attack.transform.position = transform.position;
-            object[] sendable = { atkRadius, damage };
-            attack.SendMessage("TransferData", sendable);
+            timer += Time.deltaTime;
+            if(timer > attackCD)
+            {
+                timer = 0;
+                FoeImplosion attack = GameObject.CreatePrimitive(PrimitiveType.Sphere).AddComponent<FoeImplosion>();
+                attack.transform.position = transform.position;
+                object[] sendable = { atkRadius + hitLeniency, damage };
+                attack.SendMessage("TransferData", sendable);
+            }
         }
 
         return returnable;
@@ -159,13 +164,13 @@ public class FoeManager : MonoBehaviour
 public class FoeImplosion : MonoBehaviour
 {
     // This is used for the foe attack.
-    int timer = 3;
-    int radius;
+    int timer = 15;
+    float radius;
     int damage;
 
     protected virtual void FixedUpdate()
     {
-        // Keep this alive for 3 fixed updates.
+        // Keep this alive for {let x = timer} fixed updates.
         timer--;
 
         if (timer < 0) { Destroy(gameObject); }
@@ -174,10 +179,11 @@ public class FoeImplosion : MonoBehaviour
     void TransferData(object[] data)
     {
         SphereCollider collider = GetComponent<SphereCollider>();
-        radius = (int)data[0];
+        radius = (float)data[0];
         damage = (int)data[1];
 
-        collider.radius = radius;
+        transform.localScale = Vector3.one * radius * 2;
+        collider.isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other)
