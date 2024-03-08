@@ -13,8 +13,10 @@ public enum foeState
     death
 }
 
-public class FoeManager : MonoBehaviour
+public class FoeController : MonoBehaviour
 {
+    [SerializeField] UIManager uIManager;
+
     [Category("Material things")]
     // material things
     [SerializeField] Color color;
@@ -41,12 +43,15 @@ public class FoeManager : MonoBehaviour
     {
         state = foeState.patrol;
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+
+        uIManager = GameObject.FindWithTag("UIMan").GetComponent<UIManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
         CheckState();
+        uIManager.UpdateStateText(state);
         agent.SetDestination(GetDestination());
 
         if (state == foeState.death) { Destroy(gameObject); }
@@ -107,6 +112,8 @@ public class FoeManager : MonoBehaviour
         return Vector3.Distance(transform.position, waypoints[waypointIndex]) < 1.25f;
     }
 
+
+
     void TakeDamage(int value)
     {
         // This will reset healing and searching timers. 
@@ -123,7 +130,7 @@ public class FoeManager : MonoBehaviour
             case foeState.follow: return player.transform.position;
             case foeState.search: UpdateBoredom(); return agent.destination;
             case foeState.recover: Recover(); return waypoints[0];
-            case foeState.returning: return waypoints[0];
+            case foeState.returning: waypointIndex = 0; return waypoints[0];
             case foeState.attack: Attack(); return transform.position;
         }
 
@@ -195,4 +202,18 @@ public class FoeImplosion : MonoBehaviour
     {
         other.gameObject.SendMessageUpwards("TakeDamage", damage);
     }
+}
+
+static class ColorFetchur
+{
+    static Color[] colors = {
+        Color.HSVToRGB(0.6f, 0.9f, 0.9f),
+        Color.HSVToRGB(0.16f, 0.9f, 0.9f),
+        Color.HSVToRGB(0.08f, 1, 0.9f),
+        Color.HSVToRGB(0, 0.9f, 0.9f),
+        Color.HSVToRGB(0.33f, 0.9f, 0.9f)
+        };
+
+    public static Color GetColour(foeState state) { return GetColour((int)state); }
+    public static Color GetColour(int index) { return colors[index]; }
 }
