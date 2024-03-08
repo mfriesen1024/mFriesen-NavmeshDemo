@@ -115,6 +115,12 @@ namespace StarterAssets
             JumpAndGravity();
             GroundedCheck();
             Move();
+            QuitCheck();
+        }
+
+        private static void QuitCheck()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); }
         }
 
         private void LateUpdate()
