@@ -53,7 +53,13 @@ public class FoeController : MonoBehaviour
         CheckState();
         uIManager.UpdateStateText(state);
         agent.SetDestination(GetDestination());
+        UpdateColor();
+    }
 
+    private void UpdateColor()
+    {
+        MeshRenderer mr = GetComponent<MeshRenderer>();
+        mr.material.color = ColorFetchur.GetColour(state);
     }
 
     void CheckState() // This should be used to set state

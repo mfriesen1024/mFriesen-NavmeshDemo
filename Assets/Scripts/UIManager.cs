@@ -14,5 +14,6 @@ public class UIManager : MonoBehaviour
     public void UpdateStateText(foeState state)
     {
         foeStateText.text = state.ToString();
+        foeStateText.color = ColorFetchur.GetColour(state);
     }
 }
