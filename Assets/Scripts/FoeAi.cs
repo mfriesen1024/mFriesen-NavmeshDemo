@@ -54,7 +54,6 @@ public class FoeController : MonoBehaviour
         uIManager.UpdateStateText(state);
         agent.SetDestination(GetDestination());
 
-        if (state == foeState.death) { Destroy(gameObject); }
     }
 
     void CheckState() // This should be used to set state
@@ -68,6 +67,7 @@ public class FoeController : MonoBehaviour
             case foeState.returning: ReturnedCheck(); break;
             // due to a lack of a playerside attack, recovery isn't needed. Throw a notimplementedexception.
             case foeState.recover: throw new NotImplementedException();
+            case foeState.death: print("State was death, destroying gameObject"); Destroy(gameObject); break;
         }
         InjuryCheck();
 
