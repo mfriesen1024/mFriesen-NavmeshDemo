@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using UnityEngine;
 
@@ -60,6 +61,8 @@ public class FoeManager : MonoBehaviour
             case foeState.follow: CheckForPlayer(); AtkCheck(); break;
             case foeState.search: CheckForPlayer(); BoredomCheck(); break;
             case foeState.returning: ReturnedCheck(); break;
+            // due to a lack of a playerside attack, recovery isn't needed. Throw a notimplementedexception.
+            case foeState.recover: throw new NotImplementedException();
         }
         InjuryCheck();
 
