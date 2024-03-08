@@ -206,7 +206,7 @@ GameObject:
   - component: {fileID: 54239955}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: Untagged
+  m_TagString: UIMan
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -635,6 +635,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d26e09e32923a2a41a26cd839cab673c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uIManager: {fileID: 0}
   color: {r: 0, g: 0, b: 0, a: 0}
   material: {fileID: 2100000, guid: 17e8ca3bc880ed94d8e6525d82011013, type: 2}
   agent: {fileID: 528842935}
