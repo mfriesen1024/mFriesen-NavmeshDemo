@@ -202,10 +202,19 @@ public class FoeImplosion : MonoBehaviour
 
         transform.localScale = Vector3.one * radius * 2;
         collider.isTrigger = true;
+        SetTransparent(collider);
+    }
 
+    private static void SetTransparent(SphereCollider collider)
+    {
         MeshRenderer meshRenderer = collider.GetComponent<MeshRenderer>();
+        Material m = meshRenderer.material;
         Color c = Color.HSVToRGB(0, 0.75f, 0.75f); c.a = 0.5f;
         meshRenderer.material.color = c;
+        m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m.EnableKeyword("_ALPHABLEND_ON");
+        m.renderQueue = 3000;
     }
 
     private void OnTriggerEnter(Collider other)
