@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using UnityEngine;
 
-enum foeState
+public enum foeState
 {
     patrol,
     follow,
@@ -151,7 +151,7 @@ public class FoeManager : MonoBehaviour
         void Attack()
         {
             timer += Time.deltaTime;
-            if(timer > attackCD)
+            if (timer > attackCD)
             {
                 timer = 0;
                 FoeImplosion attack = GameObject.CreatePrimitive(PrimitiveType.Sphere).AddComponent<FoeImplosion>();
