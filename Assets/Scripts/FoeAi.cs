@@ -39,7 +39,6 @@ public class FoeManager : MonoBehaviour
     void Start()
     {
         state = foeState.patrol;
-        player = GameObject.FindWithTag("Player");
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
     }
 
@@ -66,10 +65,13 @@ public class FoeManager : MonoBehaviour
 
         void CheckForPlayer() // Call from patrol, follow, return and search, sets state to follow if player found
         {
+            // Create a local player ref that is disposed after, because we only need to check if the player is nearby.
+            GameObject player = GameObject.FindWithTag("Player");
+
             // Get positions
             Vector3 ourPos = transform.position; Vector3 targetPos = player.transform.position;
-            if (Vector3.Distance(targetPos, ourPos) < sightRadius) { state = foeState.follow; }
-            else if (state == foeState.follow) { state = foeState.search; }
+            if (Vector3.Distance(targetPos, ourPos) < sightRadius) { state = foeState.follow; this.player = GameObject.FindWithTag("Player"); }
+            else if (state == foeState.follow) { state = foeState.search; this.player = null; } // Dispose of player, we don't need to know they exist anymore.
         }
 
         void AtkCheck() // Call from follow and attack
