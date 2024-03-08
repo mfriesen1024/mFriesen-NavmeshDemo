@@ -202,6 +202,10 @@ public class FoeImplosion : MonoBehaviour
 
         transform.localScale = Vector3.one * radius * 2;
         collider.isTrigger = true;
+
+        MeshRenderer meshRenderer = collider.GetComponent<MeshRenderer>();
+        Color c = Color.HSVToRGB(0, 0.75f, 0.75f); c.a = 0.5f;
+        meshRenderer.material.color = c;
     }
 
     private void OnTriggerEnter(Collider other)
